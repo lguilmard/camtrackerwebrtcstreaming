@@ -6,54 +6,14 @@ import cv2
 import math as m 
 
 import os
-localPath=str(os.path.dirname(os.path.realpath(__file__)))
-
-print(localPath)
 
 
-# ~ print(sys.argv)
-verbose = len(sys.argv) > 1
-face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
-
-# ~ fake camera
-# ~ https://github.com/jremmons/pyfakewebcam
+# ~ print(localPath)
 
 def nothing(x):
 	pass
 
 
-
-cv2.namedWindow('cadreur')
-cap = cv2.VideoCapture(0)
-setting = {}
-
-if verbose == True:
-	cv2.namedWindow('image')
-	# create trackbars for color change
-	cv2.createTrackbar('NN_img_rescale(x100)','image',130,450,nothing)
-	cv2.createTrackbar('enlarge_height(x100)','image',240,450,nothing)
-	cv2.createTrackbar('sizeCare(x100)','image',50,200,nothing)
-	cv2.createTrackbar('decay(x100)','image',50,100,nothing)
-
-ret, img = cap.read()
-# ~ img = cv2.imread('test2.png')
-resolution = img.shape
-maxface_H_W = (200,200)
-init = 10000
-
-faces_pos = [range(0,resolution[1],int(resolution[1]/maxface_H_W[1])), 
-			 range(0,resolution[0],int(resolution[0]/maxface_H_W[0]))]
-
-# ~ print(faces_pos,resolution,maxface_H_W)
-
-vote_matrix = [
-			np.array([0]*(len(faces_pos[0])-1)+[init]),
-			np.array([init]+[0]*(len(faces_pos[0])-1)),
-			np.array([init]+[0]*(len(faces_pos[1])-1)),
-			np.array([0]*(len(faces_pos[1])-1)+[init]),
-			(0,0,resolution[1],resolution[0])
-			] # LimGauche LimDroite LimHaut LimBas ROI
 
 
 
@@ -145,273 +105,248 @@ def get_field(field,L,R,U,D,resolution):
 def vote_dist_coor(vote,resolution):
 	return
 
-if verbose != True:
-	try:
-		read_dictionary = np.load(localPath+'/setting.npy',allow_pickle='TRUE').item()
-		NN_img_rescale = float(read_dictionary[NN_img_rescale])
-		Hxscale = float(read_dictionary[Hxscale])
-		sizeCare = float(read_dictionary[sizeCare])
-		decay = float(read_dictionary[decay])
-	except:
-		NN_img_rescale = 1.3
-		Hxscale = 2.4
-		sizeCare = 0.5
-		decay = 0.75
-		setting = {"NN_img_rescale":NN_img_rescale, 
-		"Hxscale":Hxscale,
-		"sizeCare":sizeCare,
-		"decay":decay}
-		np.save(localPath+'/setting.npy', setting) 
 
-while 1:
+
+def cadreur():
+	# ~ print(sys.argv)
+	localPath=str(os.path.dirname(os.path.realpath(__file__)))
+	verbose = len(sys.argv) > 1
+	face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_default.xml')
+	eye_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
+	
+	# ~ fake camera
+	# ~ https://github.com/jremmons/pyfakewebcam
+	
+	cv2.namedWindow('cadreur')
+	cap = cv2.VideoCapture(0)
+	setting = {}
+	
 	if verbose == True:
-		NN_img_rescale = max(1.1,cv2.getTrackbarPos('NN_img_rescale(x100)','image')/float(100))
-		Hxscale = max(1,cv2.getTrackbarPos('enlarge_height(x100)','image')/float(100))
-		sizeCare = max(0,min(2,cv2.getTrackbarPos('sizeCare(x100)','image')/float(100)))
-		decay = max(0.1, min(1, cv2.getTrackbarPos('decay(x100)','image')/float(100)))
-		setting = {"NN_img_rescale":NN_img_rescale, 
-		"Hxscale":Hxscale,
-		"sizeCare":sizeCare,
-		"decay":decay}
-	
-	
-	# ~ print(NN_img_rescale)
+		cv2.namedWindow('image')
+		# create trackbars for color change
+		cv2.createTrackbar('NN_img_rescale(x100)','image',130,450,nothing)
+		cv2.createTrackbar('enlarge_height(x100)','image',240,450,nothing)
+		cv2.createTrackbar('sizeCare(x100)','image',50,200,nothing)
+		cv2.createTrackbar('decay(x100)','image',50,100,nothing)
 	
 	ret, img = cap.read()
 	# ~ img = cv2.imread('test2.png')
-	img = cv2.flip( img, 1 )
-	img_oigine = img.copy()
+	resolution = img.shape
+	maxface_H_W = (200,200)
+	init = 10000
+	
+	faces_pos = [range(0,resolution[1],int(resolution[1]/maxface_H_W[1])), 
+				 range(0,resolution[0],int(resolution[0]/maxface_H_W[0]))]
+	
+	# ~ print(faces_pos,resolution,maxface_H_W)
+	
+	vote_matrix = [
+				np.array([0]*(len(faces_pos[0])-1)+[init]),
+				np.array([init]+[0]*(len(faces_pos[0])-1)),
+				np.array([init]+[0]*(len(faces_pos[1])-1)),
+				np.array([0]*(len(faces_pos[1])-1)+[init]),
+				(0,0,resolution[1],resolution[0])
+				] # LimGauche LimDroite LimHaut LimBas ROI
+	
+	if verbose != True:
+		try:
+			read_dictionary = np.load(localPath+'/setting.npy',allow_pickle='TRUE').item()
+			NN_img_rescale = float(read_dictionary[NN_img_rescale])
+			Hxscale = float(read_dictionary[Hxscale])
+			sizeCare = float(read_dictionary[sizeCare])
+			decay = float(read_dictionary[decay])
+		except:
+			NN_img_rescale = 1.3
+			Hxscale = 2.4
+			sizeCare = 0.5
+			decay = 0.75
+			setting = {"NN_img_rescale":NN_img_rescale, 
+			"Hxscale":Hxscale,
+			"sizeCare":sizeCare,
+			"decay":decay}
+			np.save(localPath+'/setting.npy', setting) 
+	
+	while 1:
+		if verbose == True:
+			NN_img_rescale = max(1.1,cv2.getTrackbarPos('NN_img_rescale(x100)','image')/float(100))
+			Hxscale = max(1,cv2.getTrackbarPos('enlarge_height(x100)','image')/float(100))
+			sizeCare = max(0,min(2,cv2.getTrackbarPos('sizeCare(x100)','image')/float(100)))
+			decay = max(0.1, min(1, cv2.getTrackbarPos('decay(x100)','image')/float(100)))
+			setting = {"NN_img_rescale":NN_img_rescale, 
+			"Hxscale":Hxscale,
+			"sizeCare":sizeCare,
+			"decay":decay}
+		
+		
+		# ~ print(NN_img_rescale)
+		
+		ret, img = cap.read()
+		# ~ img = cv2.imread('test2.png')
+		img = cv2.flip( img, 1 )
+		img_oigine = img.copy()
+		
+		if verbose == True:
+			cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+		
+		
+		# mire
+		# ~ cv2.line(img,(500,250),(0,250),(0,255,0),1)
+		# ~ cv2.line(img,(250,0),(250,500),(0,255,0),1)
+		# ~ cv2.circle(img, (250, 250), 5, (255, 255, 255), -1)
+		
+		gray  = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		faces = face_cascade.detectMultiScale(gray, NN_img_rescale, 5)
+		
+		list_face_ROI_center = []
+		list_face_ROI_left = []
+		list_face_ROI_right = []
+		list_face_ROI_up = []
+		list_face_ROI_down = []
+		list_face_ROI_weight = []
+		
+		
+		
+		#detect the face and make a rectangle around it.
+		for (x,y,w,h) in faces:
+			# ~ (x,y,w,h) = rounder_squares(square,resolution,maxface_W_H, devide_face=3)
+			cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),5)
+			roi_gray  = gray[y:y+h, x:x+w]
+			roi_color = img[y:y+h, x:x+w]
+			
+			# eyes
+			# ~ eyes = eye_cascade.detectMultiScale(roi_gray, NN_img_rescale, 2)
+			# ~ for (ex,ey,ew,eh) in eyes:
+				# ~ cv2.rectangle(img,(x+ex,y+ey),(x+ex+ew,y+ey+eh),(0,255,255),2)
+			eyes = []
+			
+			if len(eyes) !=0:
+				CM_eyes = squares_CM(eyes, xshift=x, yshift=y)
+			else:
+				CM_eyes = (int(x+w/2),int(y+h*1/3))
+			
+			linePoint1 = (x,CM_eyes[1])
+			linePoint2 = (x+w,CM_eyes[1])
+			if verbose == True:
+				cv2.line(img,linePoint1,linePoint2,(0,255,0),1)
+			
+			# face ROI
+			face_ROI_center = quatize((int(x+w/2),CM_eyes[1]),faces_pos)
+			face_ROI_left = quatize((int(x+1.5*w),CM_eyes[1]),faces_pos)
+			face_ROI_right = quatize((int(x-0.5*w),CM_eyes[1]),faces_pos)
+			face_ROI_up = quatize((int(x+w/2),int(CM_eyes[1]-Hxscale*w*1/3)),faces_pos)
+			face_ROI_down = quatize((int(x+w/2),int(CM_eyes[1]+Hxscale*w*2/3)),faces_pos)
+			# ~ print(img.shape, quatize((int(x+w/2),int(CM_eyes[1]+Hxscale*w*2/3)),faces_pos), (int(x+w/2),int(CM_eyes[1]+Hxscale*w*2/3)) )
+			face_ROI_weight = m.pow(h*w,sizeCare)
+			
+			#store 
+			list_face_ROI_center.append(face_ROI_center)
+			list_face_ROI_left.append(face_ROI_left)
+			list_face_ROI_right.append(face_ROI_right)
+			list_face_ROI_up.append(face_ROI_up)
+			list_face_ROI_down.append(face_ROI_down)
+			list_face_ROI_weight.append(face_ROI_weight)
+			
+			if verbose == True:
+				cv2.circle(img, face_ROI_center, max(5,int(m.sqrt(h*w)*0.05)), (0, 0, 255), -1)
+				
+				# ~ # limtes droite gauche
+				
+				cv2.circle(img, face_ROI_left, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
+				cv2.circle(img, face_ROI_right, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
+				cv2.circle(img, face_ROI_up, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
+				cv2.circle(img, face_ROI_down, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
+		
+		
+		if len(faces)>0:
+			
+			faces_ROI = quatize(points_CM(list_face_ROI_center, list_face_ROI_weight), faces_pos)
+			if verbose == True:
+				cv2.circle(img, faces_ROI, max(5,int(m.sqrt(h*w)*0.05)), (255, 255, 0), -1)
+			
+			# si motorisation : correction
+			#print( -(resolution[1]/2-faces_ROI[0]),resolution[0]/2-faces_ROI[1])
+			if verbose == True:
+				cv2.circle(img, (int(resolution[1]/2),int(resolution[0]/2)), 5, (255, 255, 255), -1)
+			
+			C = coord_index_list( faces_ROI ,list_face_ROI_weight, faces_pos)
+			
+			L = max_weight_point(list_face_ROI_left, np.array(list_face_ROI_weight)*[i[0] for i in list_face_ROI_left])
+			# ~ cv2.line(img,(L[0],0),(L[0],img.shape[0]),(0,0,255),3)
+			L = coord_index_list( L ,list_face_ROI_weight,faces_pos)[0]
+			
+			R = max_weight_point(list_face_ROI_right, np.array(list_face_ROI_weight)*[img.shape[1]-i[0] for i in list_face_ROI_right])
+			# ~ cv2.line(img,(R[0],0),(R[0],img.shape[0]),(0,0,255),3)
+			R = coord_index_list( R ,list_face_ROI_weight,faces_pos)[0]
+			
+			U = max_weight_point(list_face_ROI_up, np.array(list_face_ROI_weight)*[img.shape[0]-i[1] for i in list_face_ROI_up])
+			# ~ cv2.line(img,(0,U[1]),(img.shape[1],U[1]),(0,0,255),3)
+			U = coord_index_list( U ,list_face_ROI_weight,faces_pos)[1]
+			
+			D = max_weight_point(list_face_ROI_down, np.array(list_face_ROI_weight)*[i[1] for i in list_face_ROI_down])
+			# ~ cv2.line(img,(0,D[1]),(img.shape[1],D[1]),(0,0,255),3)
+			D = coord_index_list( D ,list_face_ROI_weight,faces_pos)[1]
+			
+			# ~ print(faces_pos)
+			vote_matrix[0] = vote_matrix[0]*decay+np.array(L)
+			vote_matrix[1] = vote_matrix[1]*decay+np.array(R)
+			vote_matrix[2] = vote_matrix[2]*decay+np.array(U)
+			vote_matrix[3] = vote_matrix[3]*decay+np.array(D)
+			
+			CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
+			CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )
+			CU = int( np.average(faces_pos[1],weights=vote_matrix[2]) )
+			CD = int( np.average(faces_pos[1],weights=vote_matrix[3]) )
+			
+			# ~ for i in range(len(vote_matrix)):
+				# ~ print(len(faces_pos[0]),len(faces_pos[1]), i,vote_matrix[i].shape)
+			vote_matrix[-1] = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
+			
+			# ~ print(C,L,R,U,D)  np.average(CMX,weights=suqares_weights)
+			# ~ CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
+			# ~ CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )
+			# ~ CU = int( np.average(faces_pos[1],weights=vote_matrix[2]) )
+			# ~ CD = int( np.average(faces_pos[1],weights=vote_matrix[3]) )
+			
+			if verbose == True:
+				cv2.line(img,(CL,0),(CL,img.shape[0]),(0,0,255),3)
+				cv2.line(img,(CR,0),(CR,img.shape[0]),(0,0,255),3)
+				cv2.line(img,(0,CU),(img.shape[1],CU),(0,0,255),3)
+				cv2.line(img,(0,CD),(img.shape[1],CD),(0,0,255),3)
+				
+			# ~ print(vote_matrix[-1])
+		
+		# ~ print(resolution,vote_matrix)
+		cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
+		
+		ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
+		if verbose == True:
+			#Display the stream.
+			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
+			cv2.imshow('image',img )
+			cv2.imshow('cadreur',ROI )
+			#Hit 'Esc' to terminate execution
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+		
+		if verbose == False:
+			#Display the stream.
+			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
+			cv2.imshow('cadreur',ROI )
+			
+			#Hit 'Esc' to terminate execution
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+			
+		
+	
+	
+	cv2.destroyAllWindows()
 	
 	if verbose == True:
-		cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-	
-	
-	# mire
-	# ~ cv2.line(img,(500,250),(0,250),(0,255,0),1)
-	# ~ cv2.line(img,(250,0),(250,500),(0,255,0),1)
-	# ~ cv2.circle(img, (250, 250), 5, (255, 255, 255), -1)
-	
-	gray  = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	faces = face_cascade.detectMultiScale(gray, NN_img_rescale, 5)
-	
-	list_face_ROI_center = []
-	list_face_ROI_left = []
-	list_face_ROI_right = []
-	list_face_ROI_up = []
-	list_face_ROI_down = []
-	list_face_ROI_weight = []
-	
-	
-	
-	#detect the face and make a rectangle around it.
-	for (x,y,w,h) in faces:
-		# ~ (x,y,w,h) = rounder_squares(square,resolution,maxface_W_H, devide_face=3)
-		cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),5)
-		roi_gray  = gray[y:y+h, x:x+w]
-		roi_color = img[y:y+h, x:x+w]
-		
-		# eyes
-		# ~ eyes = eye_cascade.detectMultiScale(roi_gray, NN_img_rescale, 2)
-		# ~ for (ex,ey,ew,eh) in eyes:
-			# ~ cv2.rectangle(img,(x+ex,y+ey),(x+ex+ew,y+ey+eh),(0,255,255),2)
-		eyes = []
-		
-		if len(eyes) !=0:
-			CM_eyes = squares_CM(eyes, xshift=x, yshift=y)
-		else:
-			CM_eyes = (int(x+w/2),int(y+h*1/3))
-		
-		linePoint1 = (x,CM_eyes[1])
-		linePoint2 = (x+w,CM_eyes[1])
-		if verbose == True:
-			cv2.line(img,linePoint1,linePoint2,(0,255,0),1)
-		
-		# face ROI
-		face_ROI_center = quatize((int(x+w/2),CM_eyes[1]),faces_pos)
-		face_ROI_left = quatize((int(x+1.5*w),CM_eyes[1]),faces_pos)
-		face_ROI_right = quatize((int(x-0.5*w),CM_eyes[1]),faces_pos)
-		face_ROI_up = quatize((int(x+w/2),int(CM_eyes[1]-Hxscale*w*1/3)),faces_pos)
-		face_ROI_down = quatize((int(x+w/2),int(CM_eyes[1]+Hxscale*w*2/3)),faces_pos)
-		# ~ print(img.shape, quatize((int(x+w/2),int(CM_eyes[1]+Hxscale*w*2/3)),faces_pos), (int(x+w/2),int(CM_eyes[1]+Hxscale*w*2/3)) )
-		face_ROI_weight = m.pow(h*w,sizeCare)
-		
-		#store 
-		list_face_ROI_center.append(face_ROI_center)
-		list_face_ROI_left.append(face_ROI_left)
-		list_face_ROI_right.append(face_ROI_right)
-		list_face_ROI_up.append(face_ROI_up)
-		list_face_ROI_down.append(face_ROI_down)
-		list_face_ROI_weight.append(face_ROI_weight)
-		
-		if verbose == True:
-			cv2.circle(img, face_ROI_center, max(5,int(m.sqrt(h*w)*0.05)), (0, 0, 255), -1)
-			
-			# ~ # limtes droite gauche
-			
-			cv2.circle(img, face_ROI_left, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
-			cv2.circle(img, face_ROI_right, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
-			cv2.circle(img, face_ROI_up, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
-			cv2.circle(img, face_ROI_down, max(5,int(m.sqrt(h*w)*0.05)), (255, 0, 0), -1)
-	
-	
-	if len(faces)>0:
-		
-		faces_ROI = quatize(points_CM(list_face_ROI_center, list_face_ROI_weight), faces_pos)
-		if verbose == True:
-			cv2.circle(img, faces_ROI, max(5,int(m.sqrt(h*w)*0.05)), (255, 255, 0), -1)
-		
-		# si motorisation : correction
-		#print( -(resolution[1]/2-faces_ROI[0]),resolution[0]/2-faces_ROI[1])
-		if verbose == True:
-			cv2.circle(img, (int(resolution[1]/2),int(resolution[0]/2)), 5, (255, 255, 255), -1)
-		
-		C = coord_index_list( faces_ROI ,list_face_ROI_weight, faces_pos)
-		
-		L = max_weight_point(list_face_ROI_left, np.array(list_face_ROI_weight)*[i[0] for i in list_face_ROI_left])
-		# ~ cv2.line(img,(L[0],0),(L[0],img.shape[0]),(0,0,255),3)
-		L = coord_index_list( L ,list_face_ROI_weight,faces_pos)[0]
-		
-		R = max_weight_point(list_face_ROI_right, np.array(list_face_ROI_weight)*[img.shape[1]-i[0] for i in list_face_ROI_right])
-		# ~ cv2.line(img,(R[0],0),(R[0],img.shape[0]),(0,0,255),3)
-		R = coord_index_list( R ,list_face_ROI_weight,faces_pos)[0]
-		
-		U = max_weight_point(list_face_ROI_up, np.array(list_face_ROI_weight)*[img.shape[0]-i[1] for i in list_face_ROI_up])
-		# ~ cv2.line(img,(0,U[1]),(img.shape[1],U[1]),(0,0,255),3)
-		U = coord_index_list( U ,list_face_ROI_weight,faces_pos)[1]
-		
-		D = max_weight_point(list_face_ROI_down, np.array(list_face_ROI_weight)*[i[1] for i in list_face_ROI_down])
-		# ~ cv2.line(img,(0,D[1]),(img.shape[1],D[1]),(0,0,255),3)
-		D = coord_index_list( D ,list_face_ROI_weight,faces_pos)[1]
-		
-		# ~ print(faces_pos)
-		vote_matrix[0] = vote_matrix[0]*decay+np.array(L)
-		vote_matrix[1] = vote_matrix[1]*decay+np.array(R)
-		vote_matrix[2] = vote_matrix[2]*decay+np.array(U)
-		vote_matrix[3] = vote_matrix[3]*decay+np.array(D)
-		
-		CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
-		CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )
-		CU = int( np.average(faces_pos[1],weights=vote_matrix[2]) )
-		CD = int( np.average(faces_pos[1],weights=vote_matrix[3]) )
-		
-		# ~ for i in range(len(vote_matrix)):
-			# ~ print(len(faces_pos[0]),len(faces_pos[1]), i,vote_matrix[i].shape)
-		vote_matrix[-1] = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
-		
-		# ~ print(C,L,R,U,D)  np.average(CMX,weights=suqares_weights)
-		# ~ CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
-		# ~ CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )
-		# ~ CU = int( np.average(faces_pos[1],weights=vote_matrix[2]) )
-		# ~ CD = int( np.average(faces_pos[1],weights=vote_matrix[3]) )
-		
-		if verbose == True:
-			cv2.line(img,(CL,0),(CL,img.shape[0]),(0,0,255),3)
-			cv2.line(img,(CR,0),(CR,img.shape[0]),(0,0,255),3)
-			cv2.line(img,(0,CU),(img.shape[1],CU),(0,0,255),3)
-			cv2.line(img,(0,CD),(img.shape[1],CD),(0,0,255),3)
-			
-		# ~ print(vote_matrix[-1])
-	
-	# ~ print(resolution,vote_matrix)
-	cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
-	
-	ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
-	if verbose == True:
-		#Display the stream.
-		# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
-		cv2.imshow('image',img )
-		cv2.imshow('cadreur',ROI )
-		#Hit 'Esc' to terminate execution
-		k = cv2.waitKey(30) & 0xff
-		if k == 27:
-			break
-	
-	if verbose == False:
-		#Display the stream.
-		# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
-		cv2.imshow('cadreur',ROI )
-		
-		#Hit 'Esc' to terminate execution
-		k = cv2.waitKey(30) & 0xff
-		if k == 27:
-			break
-		
-	
+		np.save(localPath+'/setting.npy', setting) 
 
 
-cv2.destroyAllWindows()
-
-if verbose == True:
-	np.save(localPath+'/setting.npy', setting) 
-
-"""
-## SOURCE >>> https://www.learnrobotics.org/blog/face-tracking-opencv/
-
-#import all the required modules
-
-import numpy as np
-import serial
-import time
-import sys
-import cv2
-
-#sys.path.append('/usr/local/lib/python2.7/site-packages')
-
-#Setup Communication path for arduino (In place of 'COM5' (windows) or ''/dev/tty.usbmodemxxx' (mac) put the port to which your arduino is connected)
-arduino = serial.Serial(port='/dev/cu.usbmodem14201', baudrate=9600)
-time.sleep(2)
-print("Connected to Arduino...")
-
-#importing the Haarcascade for face detection
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-
-#To capture the video stream from webcam.
-cap = cv2.VideoCapture(0)
-print("Getting camera image...")
-#Read the captured image, convert it to Gray image and find faces
-while 1:
-
-	ret, img = cap.read()
-	cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-	#cv2.resizeWindow('img', 500,500)
-	cv2.line(img,(500,250),(0,250),(0,255,0),1)
-	cv2.line(img,(250,0),(250,500),(0,255,0),1)
-	cv2.circle(img, (250, 250), 5, (255, 255, 255), -1)
-	gray  = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	faces = face_cascade.detectMultiScale(gray, 1.3)
-
-#detect the face and make a rectangle around it.
-	for (x,y,w,h) in faces:
-		cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),5)
-		roi_gray  = gray[y:y+h, x:x+w]
-		roi_color = img[y:y+h, x:x+w]
-
-		arr = {y:y+h, x:x+w}
-		print (arr)
-
-		print ('X :' +str(x))
-		print ('Y :'+str(y))
-		print ('x+w :' +str(x+w))
-		print ('y+h :' +str(y+h))
-
-# Center of roi (Rectangle)
-		xx = int(x+(x+h)/2)
-		yy = int(y+(y+w)/2)
-		print (xx)
-		print (yy)
-		center = (xx,yy)
-
-# sending data to arduino
-		print("Center of Rectangle is :", center)
-		data = "X{0:d}Y{1:d}Z".format(xx, yy)
-		print ("output = '" +data+ "'")
-		arduino.write(data.encode())
-
-#Display the stream.
-	cv2.imshow('img',img)
-
-#Hit 'Esc' to terminate execution
-	k = cv2.waitKey(30) & 0xff
-	if k == 27:
-	   break
-"""
+if __name__ == '__main__':
+	cadreur()

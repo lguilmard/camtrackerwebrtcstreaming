@@ -132,7 +132,10 @@ def get_field(field,L,R,U,D,resolution):
 	if ratio_ROI < ratio: #portrait
 		w = (D-U)*ratio
 		dw = (w - (L-R))/2
-		field= (int(max(0,R-dw)) , U , int(w) , (D-U))
+		# ~ if R+w >= resolution[1]:
+			# ~ field= (int(resolution[1]-w) , U , int(w) , (D-U))
+		# ~ else:
+		field= (int(min(max(0,R-dw),resolution[1]-w) ), U , int(w) , (D-U))
 	elif ratio_ROI > ratio: #landscape
 		h = (L-R)/ratio
 		dh = (h - (D-U))

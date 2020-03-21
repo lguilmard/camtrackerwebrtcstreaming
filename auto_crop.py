@@ -308,6 +308,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				# ~ print(len(faces_pos[0]),len(faces_pos[1]), i,vote_matrix[i].shape)
 			vote_matrix[-1] = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
 			
+			
+			
+			print( -(int( vote_matrix[-1][0]+vote_matrix[-1][2]/2 )-faces_ROI[0]),int( vote_matrix[-1][1]+vote_matrix[-1][3]/2 )-faces_ROI[1])
+			
 			# ~ print(C,L,R,U,D)  np.average(CMX,weights=suqares_weights)
 			# ~ CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
 			# ~ CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )

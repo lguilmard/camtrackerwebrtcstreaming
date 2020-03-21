@@ -155,7 +155,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	ret, img = cap.read()
 	# ~ img = cv2.imread('test2.png')
 	resolution = img.shape
-	maxface_H_W = (300,300)
+	maxface_H_W = (int(img.shape[0]/2),int(img.shape[1])/2)
 	init = 10000
 	
 	faces_pos = [range(0,resolution[1],int(resolution[1]/maxface_H_W[1])), 
@@ -171,6 +171,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				(0,0,resolution[1],resolution[0])
 				] # LimGauche LimDroite LimHaut LimBas ROI
 	
+	# ~ print(len(vote_matrix[0]),len(vote_matrix[2]))
 	
 	
 	while 1:
@@ -308,9 +309,24 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				# ~ print(len(faces_pos[0]),len(faces_pos[1]), i,vote_matrix[i].shape)
 			vote_matrix[-1] = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
 			
+			Xfield = int( vote_matrix[-1][0]+vote_matrix[-1][2]/2 )
+			Yfield = int( vote_matrix[-1][1]+vote_matrix[-1][3]/2 )
 			
+			## speed up recrop if out of the box
+			# ~ print( -(Xfield-faces_ROI[0]),Yfield-faces_ROI[1])
+			if abs(Xfield-faces_ROI[0]) > vote_matrix[-1][2]/2*2/3:
+				# ~ print ("outofbox W")
+				decay *= 0.8
+			elif  abs(Yfield-faces_ROI[1]) > vote_matrix[-1][3]/2*2/3:
+				# ~ print ("outofbox H")
+				decay *= 0.8
+			else:
+				# ~ print ("inside the box")
+				decay = setting["decay"]
 			
-			print( -(int( vote_matrix[-1][0]+vote_matrix[-1][2]/2 )-faces_ROI[0]),int( vote_matrix[-1][1]+vote_matrix[-1][3]/2 )-faces_ROI[1])
+			# ~ cv2.circle(img, faces_ROI, max(5,int(m.sqrt(h*w)*0.05)), (255, 255, 0), -1)
+			cv2.circle(img_oigine, (Xfield, Yfield), 5, (255, 255, 255), -1)
+			cv2.circle(img_oigine, (faces_ROI[0], faces_ROI[1]), 5, (255, 255, 255), -1)
 			
 			# ~ print(C,L,R,U,D)  np.average(CMX,weights=suqares_weights)
 			# ~ CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )

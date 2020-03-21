@@ -6,9 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-numpy = ""
-opencv-python = ""
-scipy = ""
+opencv-python = "*"
+numpy = "*"
+scipy = "*"
 
 [requires]
 python_version = "3.8"

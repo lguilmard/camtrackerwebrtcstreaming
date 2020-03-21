@@ -13,3 +13,7 @@ python3 cadreur/auto_crop.py -v
 
 # run from 
 python3 cadreur/auto_crop.py
+
+
+# key bindings
+Esc or Ctrl-C to quit

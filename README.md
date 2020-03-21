@@ -8,8 +8,8 @@ pipenv shell
 pipenv install
 
 
-# run AND CUSTOMIZE from script dir
+# run AND CUSTOMIZE 
 python3 cadreur/auto_crop.py -v
 
-# run from script dir
+# run from 
 python3 cadreur/auto_crop.py

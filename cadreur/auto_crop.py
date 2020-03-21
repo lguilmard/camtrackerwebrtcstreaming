@@ -20,6 +20,7 @@ def nothing(x):
 
 cv2.namedWindow('cadreur')
 cap = cv2.VideoCapture(0)
+setting = {}
 
 if verbose == True:
 	cv2.namedWindow('image')
@@ -135,17 +136,35 @@ def get_field(field,L,R,U,D,resolution):
 def vote_dist_coor(vote,resolution):
 	return
 
+if verbose != True:
+	try:
+		read_dictionary = np.load('setting.npy',allow_pickle='TRUE').item()
+		NN_img_rescale = float(read_dictionary[NN_img_rescale])
+		Hxscale = float(read_dictionary[Hxscale])
+		sizeCare = float(read_dictionary[sizeCare])
+		decay = float(read_dictionary[decay])
+	except:
+		NN_img_rescale = 1.3
+		Hxscale = 2.4
+		sizeCare = 0.5
+		decay = 0.75
+		setting = {"NN_img_rescale":NN_img_rescale, 
+		"Hxscale":Hxscale,
+		"sizeCare":sizeCare,
+		"decay":decay}
+		np.save('setting.npy', setting) 
+
 while 1:
 	if verbose == True:
 		NN_img_rescale = max(1.1,cv2.getTrackbarPos('NN_img_rescale(x100)','image')/float(100))
 		Hxscale = max(1,cv2.getTrackbarPos('enlarge_height(x100)','image')/float(100))
 		sizeCare = max(0,min(2,cv2.getTrackbarPos('sizeCare(x100)','image')/float(100)))
 		decay = max(0.1, min(1, cv2.getTrackbarPos('decay(x100)','image')/float(100)))
-	else:
-		NN_img_rescale = 1.3
-		Hxscale = 2.4
-		sizeCare = 0.5
-		decay = 0.75
+		setting = {"NN_img_rescale":NN_img_rescale, 
+		"Hxscale":Hxscale,
+		"sizeCare":sizeCare,
+		"decay":decay}
+	
 	
 	# ~ print(NN_img_rescale)
 	
@@ -312,6 +331,9 @@ while 1:
 
 
 cv2.destroyAllWindows()
+
+if verbose == True:
+	np.save('setting.npy', setting) 
 
 """
 ## SOURCE >>> https://www.learnrobotics.org/blog/face-tracking-opencv/

@@ -107,7 +107,7 @@ def vote_dist_coor(vote,resolution):
 
 
 
-def cadreur():
+def cadreur(cap = cv2.VideoCapture(0)):
 	# ~ print(sys.argv)
 	localPath=str(os.path.dirname(os.path.realpath(__file__)))
 	verbose = len(sys.argv) > 1
@@ -118,7 +118,7 @@ def cadreur():
 	# ~ https://github.com/jremmons/pyfakewebcam
 	
 	cv2.namedWindow('cadreur')
-	cap = cv2.VideoCapture(0)
+	
 	setting = {}
 	
 	if verbose == True:
@@ -349,4 +349,4 @@ def cadreur():
 
 
 if __name__ == '__main__':
-	cadreur()
+	cadreur(cv2.VideoCapture(0))

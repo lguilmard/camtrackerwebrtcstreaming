@@ -4,16 +4,17 @@ import time
 import sys
 import cv2
 import math as m 
-
+from scipy.sparse import csr_matrix
 import os
 localPath=str(os.path.dirname(os.path.realpath(__file__)))
 
+print(localPath)
 
 
 # ~ print(sys.argv)
 verbose = len(sys.argv) > 1
-face_cascade = cv2.CascadeClassifier(localPath+'/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(localPath+'/haarcascade_eye_tree_eyeglasses.xml')
+face_cascade = cv2.CascadeClassifier('/Users/mpvphd/Desktop/python_projets/cadreur/camtrackerwebrtcstreaming/XML_nn/haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('/Users/mpvphd/Desktop/python_projets/cadreur/camtrackerwebrtcstreaming/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
 
 # ~ fake camera
 # ~ https://github.com/jremmons/pyfakewebcam

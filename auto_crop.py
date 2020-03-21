@@ -119,20 +119,43 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	
 	cv2.namedWindow('cadreur')
 	
-	setting = {}
+	
+	try:
+		read_dictionary = np.load(localPath+'/setting.npy',allow_pickle='TRUE').item()
+		NN_img_rescale = float(read_dictionary["NN_img_rescale"])
+		Hxscale = float(read_dictionary["Hxscale"])
+		sizeCare = float(read_dictionary["sizeCare"])
+		decay = float(read_dictionary["decay"])
+		print('setting file founded')
+		setting = {"NN_img_rescale":NN_img_rescale, 
+		"Hxscale":Hxscale,
+		"sizeCare":sizeCare,
+		"decay":decay}
+		print(setting)
+	except:
+		NN_img_rescale = 1.3
+		Hxscale = 2.4
+		sizeCare = 0.5
+		decay = 0.75
+		setting = {"NN_img_rescale":NN_img_rescale, 
+		"Hxscale":Hxscale,
+		"sizeCare":sizeCare,
+		"decay":decay}
+		np.save(localPath+'/setting.npy', setting) 
+		print('setting file not found -> default running')
 	
 	if verbose == True:
 		cv2.namedWindow('image')
 		# create trackbars for color change
-		cv2.createTrackbar('NN_img_rescale(x100)','image',130,450,nothing)
-		cv2.createTrackbar('enlarge_height(x100)','image',240,450,nothing)
-		cv2.createTrackbar('sizeCare(x100)','image',50,200,nothing)
-		cv2.createTrackbar('decay(x100)','image',50,100,nothing)
+		cv2.createTrackbar('NN_img_rescale(x100)','image',int(NN_img_rescale*100),450,nothing)
+		cv2.createTrackbar('enlarge_height(x100)','image',int(Hxscale*100),450,nothing)
+		cv2.createTrackbar('sizeCare(x100)','image',int(sizeCare*100),200,nothing)
+		cv2.createTrackbar('decay(x100)','image',int(decay*100),100,nothing)
 	
 	ret, img = cap.read()
 	# ~ img = cv2.imread('test2.png')
 	resolution = img.shape
-	maxface_H_W = (200,200)
+	maxface_H_W = (300,300)
 	init = 10000
 	
 	faces_pos = [range(0,resolution[1],int(resolution[1]/maxface_H_W[1])), 
@@ -148,35 +171,15 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				(0,0,resolution[1],resolution[0])
 				] # LimGauche LimDroite LimHaut LimBas ROI
 	
-	if verbose != True:
-		try:
-			read_dictionary = np.load(localPath+'/setting.npy',allow_pickle='TRUE').item()
-			NN_img_rescale = float(read_dictionary[NN_img_rescale])
-			Hxscale = float(read_dictionary[Hxscale])
-			sizeCare = float(read_dictionary[sizeCare])
-			decay = float(read_dictionary[decay])
-		except:
-			NN_img_rescale = 1.3
-			Hxscale = 2.4
-			sizeCare = 0.5
-			decay = 0.75
-			setting = {"NN_img_rescale":NN_img_rescale, 
-			"Hxscale":Hxscale,
-			"sizeCare":sizeCare,
-			"decay":decay}
-			np.save(localPath+'/setting.npy', setting) 
+	
 	
 	while 1:
-		if verbose == True:
-			NN_img_rescale = max(1.1,cv2.getTrackbarPos('NN_img_rescale(x100)','image')/float(100))
-			Hxscale = max(1,cv2.getTrackbarPos('enlarge_height(x100)','image')/float(100))
-			sizeCare = max(0,min(2,cv2.getTrackbarPos('sizeCare(x100)','image')/float(100)))
-			decay = max(0.1, min(1, cv2.getTrackbarPos('decay(x100)','image')/float(100)))
-			setting = {"NN_img_rescale":NN_img_rescale, 
-			"Hxscale":Hxscale,
-			"sizeCare":sizeCare,
-			"decay":decay}
 		
+		
+		setting = {"NN_img_rescale":NN_img_rescale, 
+		"Hxscale":Hxscale,
+		"sizeCare":sizeCare,
+		"decay":decay}
 		
 		# ~ print(NN_img_rescale)
 		
@@ -187,6 +190,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		
 		if verbose == True:
 			cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+			NN_img_rescale = cv2.getTrackbarPos('NN_img_rescale(x100)','image')/100
+			Hxscale = cv2.getTrackbarPos('enlarge_height(x100)','image')/100
+			sizeCare = cv2.getTrackbarPos('sizeCare(x100)','image')/100
+			decay = cv2.getTrackbarPos('decay(x100)','image')/100
 		
 		
 		# mire
@@ -345,6 +352,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	cv2.destroyAllWindows()
 	
 	if verbose == True:
+		print(setting)
+		
 		np.save(localPath+'/setting.npy', setting) 
 
 

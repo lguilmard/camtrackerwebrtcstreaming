@@ -174,6 +174,11 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	
 	# ~ print(len(vote_matrix[0]),len(vote_matrix[2]))
 	
+	font                   = cv2.FONT_HERSHEY_SIMPLEX
+	TopLeftCornerOfText = (10,40)
+	fontScale              = 1
+	fontColor              = (0,0,255)
+	lineType               = 2
 	
 	while 1:
 		
@@ -346,10 +351,15 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		# ~ print(resolution,vote_matrix)
 		cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
 		
-		ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
+		
 		if verbose == True and pipe_it == False:
+			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
+			
+			
+			cv2.putText(img,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
+			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.imshow('image',img )
 			cv2.imshow('cadreur',ROI )
 			#Hit 'Esc' to terminate execution
@@ -358,8 +368,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				break
 		
 		if verbose == False and pipe_it == False:
+			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
+			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.imshow('cadreur',ROI )
 			
 			#Hit 'Esc' to terminate execution
@@ -368,7 +380,16 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				break
 		
 		if pipe_it == True:
-			sys.stdout.write(ROI.tostring())
+			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
+			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
+			cv2.imshow('cadreur',ROI )
+			
+			#Hit 'Esc' to terminate execution
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+			
+			sys.stdout.write(str(ROI.tostring()))
 		
 	
 	

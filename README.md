@@ -24,7 +24,7 @@ parameters :
 # run 
 • see result : python3 path/auto_crop.py (press ESQ to stop program)
 
-• pipe stream : python3 path/auto_crop.py -pipe | WHAT YOU WANT (Ctrl-c to stop)
+• pipe stream : python3 path/auto_crop.py -pipe | WHAT YOU WANT (Ctrl-c to stop) !! not tested !!
 
 
 # key bindings

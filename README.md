@@ -24,7 +24,7 @@ GUI parameters :
 # run 
 • see result : python3 path/auto_crop.py (press ESQ to stop program)
 
-• pipe stream : python3 path/auto_crop.py -pipe | WHAT YOU WANT (Ctrl-c to stop) !! not tested !!
+[ !! not tested !! ] • pipe stream : python3 path/auto_crop.py -pipe | WHAT YOU WANT (Ctrl-c to stop) 
 
 suggestion : python path/auto_crop.py -pipe | cvlc --demux=rawvideo --rawvid-fps=25 --rawvid-width=1280 --rawvid-height=720  --rawvid-chroma=RV24 - --sout "#transcode{vcodec=h264,vb=200,fps=25,width=1280,height=720}:rtp{dst=10.10.10.10,port=8081,sdp=rtsp://10.10.10.10:8081/test.sdp}"
 

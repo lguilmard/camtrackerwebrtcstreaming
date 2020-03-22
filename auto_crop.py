@@ -108,10 +108,13 @@ def vote_dist_coor(vote,resolution):
 
 
 def cadreur(cap = cv2.VideoCapture(0)):
-	# ~ print(sys.argv)
+	print(sys.argv, len(sys.argv))
 	localPath=str(os.path.dirname(os.path.realpath(__file__)))
+	noArgs = len(sys.argv) == 1
 	verbose = len(sys.argv) > 1 and sys.argv[1] == '-v'
 	pipe_it = len(sys.argv) > 1 and sys.argv[1] == '-pipe'
+	pipe_it_jpg = len(sys.argv) > 1 and sys.argv[1] == '-pipe_JPG'
+	
 	face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_default.xml')
 	eye_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
 	
@@ -352,7 +355,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
 		
 		
-		if verbose == True and pipe_it == False:
+		if verbose == True:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
@@ -360,14 +363,14 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			
 			cv2.putText(img,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
-			cv2.imshow('image',img )
-			cv2.imshow('cadreur',ROI )
+			cv2.imshow('image-verbose',img )
+			cv2.imshow('cadreur-verbose',ROI )
 			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
 		
-		if verbose == False and pipe_it == False:
+		if noArgs:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
@@ -382,17 +385,28 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		if pipe_it == True:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
-			cv2.imshow('cadreur',ROI )
+			cv2.imshow('cadreur-pipe-raw',ROI )
 			
 			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
 			
-			# ~ sys.stdout.write(str(ROI.tostring()))
+			sys.stdout.write(str(ROI.tostring()))
 		
+		if pipe_it_jpg == True:
+			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
+			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
+			cv2.imshow('cadreur-pipe-jpg',ROI )
+			ret, jpeg = cv2.imencode('.jpg', ROI)
+			#Hit 'Esc' to terminate execution
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+			
+			sys.stdout.write(str(jpeg.tobytes()))
 	
-	
+	cap.release()
 	cv2.destroyAllWindows()
 	
 	if verbose == True:

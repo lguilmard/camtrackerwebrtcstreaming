@@ -9,7 +9,7 @@ pipenv install
 
 
 # run AND CUSTOMIZE 
-python3 cadreur/auto_crop.py -v
+python3 path/auto_crop.py -v
 
 parameters :
 

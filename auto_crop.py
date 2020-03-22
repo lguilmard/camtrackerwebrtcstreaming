@@ -110,7 +110,8 @@ def vote_dist_coor(vote,resolution):
 def cadreur(cap = cv2.VideoCapture(0)):
 	# ~ print(sys.argv)
 	localPath=str(os.path.dirname(os.path.realpath(__file__)))
-	verbose = len(sys.argv) > 1
+	verbose = len(sys.argv) > 1 and sys.argv[1] == '-v'
+	pipe_it = len(sys.argv) > 1 and sys.argv[1] == '-pipe'
 	face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_default.xml')
 	eye_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
 	
@@ -324,9 +325,9 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				# ~ print ("inside the box")
 				decay = setting["decay"]
 			
-			# ~ cv2.circle(img, faces_ROI, max(5,int(m.sqrt(h*w)*0.05)), (255, 255, 0), -1)
-			cv2.circle(img_oigine, (Xfield, Yfield), 5, (255, 255, 255), -1)
-			cv2.circle(img_oigine, (faces_ROI[0], faces_ROI[1]), 5, (255, 255, 255), -1)
+			
+			# ~ cv2.circle(img_oigine, (Xfield, Yfield), 5, (255, 255, 255), -1)
+			# ~ cv2.circle(img_oigine, (faces_ROI[0], faces_ROI[1]), 5, (255, 255, 255), -1)
 			
 			# ~ print(C,L,R,U,D)  np.average(CMX,weights=suqares_weights)
 			# ~ CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
@@ -346,7 +347,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
 		
 		ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
-		if verbose == True:
+		if verbose == True and pipe_it == False:
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
 			cv2.imshow('image',img )
@@ -356,7 +357,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			if k == 27:
 				break
 		
-		if verbose == False:
+		if verbose == False and pipe_it == False:
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
 			cv2.imshow('cadreur',ROI )
@@ -365,7 +366,9 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
-			
+		
+		if pipe_it == True:
+			sys.stdout.write(ROI.tostring())
 		
 	
 	

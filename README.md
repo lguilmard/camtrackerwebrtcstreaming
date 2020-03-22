@@ -11,7 +11,7 @@ pipenv install
 # run AND CUSTOMIZE 
 python3 path/auto_crop.py -v
 
-parameters :
+GUI parameters :
 
 • NN_img_rescale : change face detection depending on subject distance
 

@@ -22,7 +22,7 @@ GUI parameters :
 • decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
 
 # run 
-• see result : python3 path/auto_crop.py (press ESQ to stop program)
+• see result : python3 path/auto_crop.py (press ESC to stop program)
 
 [ !! not tested !! ] • pipe stream : python3 path/auto_crop.py -pipe | WHAT YOU WANT (Ctrl-c to stop) 
 

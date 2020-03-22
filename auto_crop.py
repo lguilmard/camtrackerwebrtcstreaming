@@ -183,10 +183,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	while 1:
 		
 		
-		setting = {"NN_img_rescale":NN_img_rescale, 
-		"Hxscale":Hxscale,
-		"sizeCare":sizeCare,
-		"decay":decay}
+		
 		
 		# ~ print(NN_img_rescale)
 		
@@ -201,7 +198,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			Hxscale = cv2.getTrackbarPos('enlarge_height(x100)','image')/100
 			sizeCare = cv2.getTrackbarPos('sizeCare(x100)','image')/100
 			decay = cv2.getTrackbarPos('decay(x100)','image')/100
-		
+			setting = {"NN_img_rescale":NN_img_rescale, 
+						"Hxscale":Hxscale,
+						"sizeCare":sizeCare,
+						"decay":decay}
 		
 		# mire
 		# ~ cv2.line(img,(500,250),(0,250),(0,255,0),1)
@@ -327,7 +327,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				# ~ print ("outofbox H")
 				decay *= 0.8
 			else:
-				# ~ print ("inside the box")
+				# ~ print ("inside the box <> decay = ",setting["decay"],decay)
 				decay = setting["decay"]
 			
 			
@@ -389,14 +389,14 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			if k == 27:
 				break
 			
-			sys.stdout.write(str(ROI.tostring()))
+			# ~ sys.stdout.write(str(ROI.tostring()))
 		
 	
 	
 	cv2.destroyAllWindows()
 	
 	if verbose == True:
-		print(setting)
+		print('setting file write' ,setting)
 		
 		np.save(localPath+'/setting.npy', setting) 
 

@@ -2,6 +2,10 @@
 •1st make an autonomous webcam cameraman like algorithm ( adjust the field of view to see every persons in scene)
 •[TODO] 2nd use output in streamer
 
+    # development track under linux
+    # to make auto_crop output appear as webcam
+    http://wonderingcode.blogspot.com/2017/05/loopback-with-python-and-opencv.html
+
 # to install
     sudo apt-get install -y python3 python3-pip && pip3 install -r requirements.txt
 # alternative with pipenv

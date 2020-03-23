@@ -189,6 +189,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	fontColor              = (0,0,255)
 	lineType               = 2
 	
+	outOfBox = False
+	
 	while 1:
 		
 		
@@ -201,7 +203,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		img = cv2.flip( img, 1 )
 		img_oigine = img.copy()
 		
-		if verbose == True:
+		if verbose == True and outOfBox == False:
 			cv2.namedWindow('image', cv2.WINDOW_NORMAL)
 			NN_img_rescale = cv2.getTrackbarPos('NN_img_rescale(x100)','image')/100
 			Hxscale = cv2.getTrackbarPos('enlarge_height(x100)','image')/100
@@ -329,25 +331,29 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			# ~ print(abs(CR-CL),abs(CU-CD),abs(CR-CL)*0.03)
 			
 			
-			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1 or stabilizer == 0:
-				vote_matrix[-1] = new_field
 				
 			
-			Xfield = int( vote_matrix[-1][0]+vote_matrix[-1][2]/2 )
-			Yfield = int( vote_matrix[-1][1]+vote_matrix[-1][3]/2 )
+			Xfield = int( new_field[0]+new_field[2]/2 )
+			Yfield = int( new_field[1]+new_field[3]/2 )
 			
 			## speed up recrop if out of the box
 			# ~ print( -(Xfield-faces_ROI[0]),Yfield-faces_ROI[1])
-			if abs(Xfield-faces_ROI[0]) > vote_matrix[-1][2]/2*2/3:
+			if abs(Xfield-faces_ROI[0]) > new_field[2]/4:
 				# ~ print ("outofbox W")
+				outOfBox = True
 				decay *= 0.8
-			elif  abs(Yfield-faces_ROI[1]) > vote_matrix[-1][3]/2*2/3:
+			elif  abs(Yfield-faces_ROI[1]) > new_field[3]/2*2/3:
 				# ~ print ("outofbox H")
+				outOfBox = True
 				decay *= 0.8
 			else:
 				# ~ print ("inside the box <> decay = ",setting["decay"],decay)
-				decay = setting["decay"]
+				# ~ decay = setting["decay"]
+				outOfBox = False
 			
+			# ~ print( abs(CR-CL)*0.03*decay ,decay)
+			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1 or stabilizer == 0:
+				vote_matrix[-1] = new_field
 			
 			# ~ cv2.circle(img_oigine, (Xfield, Yfield), 5, (255, 255, 255), -1)
 			# ~ cv2.circle(img_oigine, (faces_ROI[0], faces_ROI[1]), 5, (255, 255, 255), -1)

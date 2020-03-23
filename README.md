@@ -39,3 +39,15 @@ suggestion : python path/auto_crop.py -pipe | cvlc --demux=rawvideo --rawvid-fps
 # key bindings
 Esc or Ctrl-C to quit
 
+# USER HELP INSTALL
+
+under linux open bash terminal and go in path where you want to get the code then do as folow
+
+    sudo apt-get update
+    sudo apt-get -y upgrade
+    sudo apt install -y git-all python3 python3-pip
+    git clone https://github.com/lguilmard/camtrackerwebrtcstreaming.git
+    pipenv shell pipenv install
+    python3 auto_crop.py -v
+
+

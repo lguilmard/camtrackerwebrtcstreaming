@@ -115,7 +115,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	pipe_it = len(sys.argv) > 1 and sys.argv[1] == '-pipe'
 	pipe_it_jpg = len(sys.argv) > 1 and sys.argv[1] == '-pipe_JPG'
 	
-	face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_default.xml')
+	face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_alt.xml')
 	eye_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
 	
 	# ~ fake camera
@@ -137,10 +137,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		"decay":decay}
 		print(setting)
 	except:
-		NN_img_rescale = 1.35
+		NN_img_rescale = 1.30
 		Hxscale = 1.9
-		sizeCare = 0.5
-		decay = 0.85
+		sizeCare = 0.85
+		decay = 0.9
 		setting = {"NN_img_rescale":NN_img_rescale, 
 		"Hxscale":Hxscale,
 		"sizeCare":sizeCare,

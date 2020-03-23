@@ -319,7 +319,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				# ~ print(len(faces_pos[0]),len(faces_pos[1]), i,vote_matrix[i].shape)
 			new_field = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
 			
-			print(abs(CR-CL),abs(CU-CD),abs(CR-CL)*0.03)
+			# ~ print(abs(CR-CL),abs(CU-CD),abs(CR-CL)*0.03)
 			
 			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1:
 				vote_matrix[-1] = new_field
@@ -378,6 +378,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				break
 		
 		if noArgs:
+			cv2.rectangle(img_oigine,(0,0,resolution[1],resolution[0]),(0,0,255),15)
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
 			#Display the stream.
 			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )

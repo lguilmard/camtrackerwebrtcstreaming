@@ -1,5 +1,6 @@
 # camtrackerwebrtcstreaming
-make an autonomous webcam python tracker that stream to a webrtc server
+•1st make an autonomous webcam cameraman like algorithm ( adjust the field of view to see every persons in scene)
+•[TODO] 2nd use output in streamer
 
 # to install
 sudo apt-get install -y python3 python3-pip && pip3 install -r requirements.txt
@@ -23,6 +24,8 @@ GUI parameters :
 
 # run 
 • see result : python3 path/auto_crop.py (press ESC to stop program)
+
+border of camera field of view is materialized by RED rectangle so that user keep aware of exiting camera field
 
 [ !! not tested !! ] • pipe stream : python3 path/auto_crop.py -pipe | WHAT YOU WANT (Ctrl-c to stop) 
 

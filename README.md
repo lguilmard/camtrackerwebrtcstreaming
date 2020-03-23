@@ -10,17 +10,14 @@ pipenv install
 
 
 # run AND CUSTOMIZE 
-python3 path/auto_crop.py -v
+        python3 path/auto_crop.py -v
 
-GUI parameters :
-
-• NN_img_rescale : change face detection depending on subject distance
-
-• Hxscale : change vertical croping
-
-• sizeCare : how much closest face is more captured compared to furthest 
-
-• decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
+        GUI parameters :
+        
+        • NN_img_rescale : change face detection depending on subject distance
+        • Hxscale : change vertical croping
+        • sizeCare : how much closest face is more captured compared to furthest 
+        • decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
 
 # run 
 • see result : python3 path/auto_crop.py (press ESC to stop program)

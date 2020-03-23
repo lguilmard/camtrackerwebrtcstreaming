@@ -130,21 +130,25 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		Hxscale = float(read_dictionary["Hxscale"])
 		sizeCare = float(read_dictionary["sizeCare"])
 		decay = float(read_dictionary["decay"])
+		stabilizer = int(read_dictionary["stabilizer"])
 		print('setting file founded')
 		setting = {"NN_img_rescale":NN_img_rescale, 
 		"Hxscale":Hxscale,
 		"sizeCare":sizeCare,
-		"decay":decay}
+		"decay":decay,
+		"stabilizer":stabilizer}
 		print(setting)
 	except:
 		NN_img_rescale = 1.30
 		Hxscale = 1.9
 		sizeCare = 0.85
 		decay = 0.9
+		stabilizer=1
 		setting = {"NN_img_rescale":NN_img_rescale, 
 		"Hxscale":Hxscale,
 		"sizeCare":sizeCare,
-		"decay":decay}
+		"decay":decay,
+		"stabilizer":stabilizer}
 		np.save(localPath+'/setting.npy', setting) 
 		print('setting file not found -> default running')
 	
@@ -152,6 +156,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		cv2.namedWindow('image')
 		
 		# create trackbars for color change
+		cv2.createTrackbar('stabilizer','image',int(stabilizer),1,nothing)
 		cv2.createTrackbar('NN_img_rescale(x100)','image',int(NN_img_rescale*100),450,nothing)
 		cv2.createTrackbar('enlarge_height(x100)','image',int(Hxscale*100),450,nothing)
 		cv2.createTrackbar('sizeCare(x100)','image',int(sizeCare*100),200,nothing)
@@ -202,10 +207,12 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			Hxscale = cv2.getTrackbarPos('enlarge_height(x100)','image')/100
 			sizeCare = cv2.getTrackbarPos('sizeCare(x100)','image')/100
 			decay = cv2.getTrackbarPos('decay(x100)','image')/100
+			stabilizer = cv2.getTrackbarPos('stabilizer','image')
 			setting = {"NN_img_rescale":NN_img_rescale, 
 						"Hxscale":Hxscale,
 						"sizeCare":sizeCare,
-						"decay":decay}
+						"decay":decay,
+						"stabilizer":stabilizer}
 		
 		# mire
 		# ~ cv2.line(img,(500,250),(0,250),(0,255,0),1)
@@ -321,7 +328,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			
 			# ~ print(abs(CR-CL),abs(CU-CD),abs(CR-CL)*0.03)
 			
-			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1:
+			
+			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1 or stabilizer == 0:
 				vote_matrix[-1] = new_field
 				
 			

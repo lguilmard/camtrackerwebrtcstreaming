@@ -138,9 +138,9 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		print(setting)
 	except:
 		NN_img_rescale = 1.35
-		Hxscale = 2.4
+		Hxscale = 1.9
 		sizeCare = 0.5
-		decay = 0.9
+		decay = 0.85
 		setting = {"NN_img_rescale":NN_img_rescale, 
 		"Hxscale":Hxscale,
 		"sizeCare":sizeCare,
@@ -150,6 +150,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	
 	if verbose == True:
 		cv2.namedWindow('image')
+		
 		# create trackbars for color change
 		cv2.createTrackbar('NN_img_rescale(x100)','image',int(NN_img_rescale*100),450,nothing)
 		cv2.createTrackbar('enlarge_height(x100)','image',int(Hxscale*100),450,nothing)
@@ -159,7 +160,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	ret, img = cap.read()
 	# ~ img = cv2.imread('test2.png')
 	resolution = img.shape
-	maxface_H_W = (int(img.shape[0]/2),int(img.shape[1])/2)
+	maxface_H_W = (int(img.shape[0]/1.1),int(img.shape[1])/1.1)
 	init = 10000
 	
 	faces_pos = [range(0,resolution[1],int(resolution[1]/maxface_H_W[1])), 
@@ -304,10 +305,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			D = coord_index_list( D ,list_face_ROI_weight,faces_pos)[1]
 			
 			# ~ print(faces_pos)
-			vote_matrix[0] = vote_matrix[0]*decay+np.array(L)
-			vote_matrix[1] = vote_matrix[1]*decay+np.array(R)
-			vote_matrix[2] = vote_matrix[2]*decay+np.array(U)
-			vote_matrix[3] = vote_matrix[3]*decay+np.array(D)
+			vote_matrix[0] = vote_matrix[0]*decay+np.array(L)*(1-decay)
+			vote_matrix[1] = vote_matrix[1]*decay+np.array(R)*(1-decay)
+			vote_matrix[2] = vote_matrix[2]*decay+np.array(U)*(1-decay)
+			vote_matrix[3] = vote_matrix[3]*decay+np.array(D)*(1-decay)
 			
 			CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
 			CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )
@@ -316,7 +317,13 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			
 			# ~ for i in range(len(vote_matrix)):
 				# ~ print(len(faces_pos[0]),len(faces_pos[1]), i,vote_matrix[i].shape)
-			vote_matrix[-1] = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
+			new_field = get_field(vote_matrix[-1],CL,CR,CU,CD,resolution) 
+			
+			print(abs(CR-CL),abs(CU-CD),abs(CR-CL)*0.03)
+			
+			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1:
+				vote_matrix[-1] = new_field
+				
 			
 			Xfield = int( vote_matrix[-1][0]+vote_matrix[-1][2]/2 )
 			Yfield = int( vote_matrix[-1][1]+vote_matrix[-1][3]/2 )
@@ -363,8 +370,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			
 			cv2.putText(img,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
-			cv2.imshow('image-verbose',img )
-			cv2.imshow('cadreur-verbose',ROI )
+			cv2.imshow('image',img )
+			cv2.imshow('cadreur',ROI )
 			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
@@ -385,7 +392,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		if pipe_it == True:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
-			cv2.imshow('cadreur-pipe-raw',ROI )
+			cv2.imshow('cadreur',ROI )
 			
 			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
@@ -397,7 +404,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		if pipe_it_jpg == True:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
-			cv2.imshow('cadreur-pipe-jpg',ROI )
+			cv2.imshow('cadreur',ROI )
 			ret, jpeg = cv2.imencode('.jpg', ROI)
 			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff

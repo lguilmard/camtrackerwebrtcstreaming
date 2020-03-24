@@ -30,7 +30,8 @@
     • sizeCare : how much closest face is more captured compared to furthest 
     • decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
 
-# run threaded fast output on tmpsf
+# run threaded fast output on tmpsf 
+# (PRESS ENTER TO STOP IT PROPERLY)
 
     # 3 threads programs 
     • thread 1 <> detect field of view in the webcam image (SLOW)

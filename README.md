@@ -11,7 +11,7 @@
 
     # make virtual camera using webcamoid.app (see https://webcamoid.github.io/)
     make tmpfs_DIR be a RAM disk (see https://osxdaily.com/2007/03/23/create-a-ram-disk-in-mac-os-x/)
-        Example : diskutil erasevolume HFS+ 'Rtmpfs_DIR' `hdiutil attach -nomount ram://102400`
+        Example : diskutil erasevolume HFS+ 'tmpfs_DIR' `hdiutil attach -nomount ram://102400` && ln -s /Volumes/tmpfs_DIR/ ./
     make virtual camera stream tmpfs_DIR/auto_crop_output.png 
 
 # to install

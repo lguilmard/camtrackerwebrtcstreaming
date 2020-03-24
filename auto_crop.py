@@ -469,7 +469,7 @@ def write_cap(cap = cv2.VideoCapture(0)):
 		img = cv2.flip( img, 1 )
 		ROI = cv2.resize(img[vote_matrix_field[1]:vote_matrix_field[1]+vote_matrix_field[3], vote_matrix_field[0]:vote_matrix_field[0]+vote_matrix_field[2]], (int(resolution[1]),int(resolution[0]))) 
 		encode_param = [int(cv2.IMWRITE_PNG_COMPRESSION), 0]
-		cv2.imwrite(localPath+'/tmpfs_DIR/test.png', ROI, encode_param)
+		cv2.imwrite(localPath+'/tmpfs_DIR/auto_crop_output.png', ROI, encode_param)
 		# ~ print('capture '+localPath+'/tmpfs_DIR/test.png',iteration)
 		
 		# ~ cv2.imshow('cadreur',ROI )

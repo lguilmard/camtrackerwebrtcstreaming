@@ -9,9 +9,9 @@
 
 • MACOSX solution 
 
-    # make virtual camera usin webcamoid.app
+    # make virtual camera using webcamoid.app (see https://webcamoid.github.io/)
     make tmpfs_DIR be a RAM disk
-    make virtual camera stream tmpfs_DIR/test.png (if unavalable run auto_crop waint 3 seconds and press ENTER to make it stops properly)
+    make virtual camera stream tmpfs_DIR/auto_crop_output.png (if unavalable run auto_crop waint 3 seconds and press ENTER to make it stops properly)
 
 # to install
     sudo apt-get install -y python3 python3-pip && pip3 install -r requirements.txt
@@ -30,10 +30,6 @@
     • sizeCare : how much closest face is more captured compared to furthest 
     • decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
 
-# run and see result
-
-    python3 path/auto_crop.py -thread (press ESC in command prompt to stop program properly)
-
 # run threaded fast output on tmpsf
 
     # 3 threads programs 
@@ -41,6 +37,9 @@
     • thread 2 <> crops / resize and write image in tmpfs_DIR directory (FAST)
     • thread 3 <> WAIT FOR ENTER KEY TO BE PRESSED (to kill threads properly and release webcam capture)
     python3 path/auto_crop.py -thread (press ENTER in command prompt to stop program properly)
+# run and see result
+
+    python3 path/auto_crop.py -thread (press ESC in command prompt to stop program properly)
 
 border of camera field of view is materialized by RED rectangle so that user keep aware of exiting camera field
 

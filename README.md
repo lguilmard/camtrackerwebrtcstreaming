@@ -7,7 +7,7 @@
     http://wonderingcode.blogspot.com/2017/05/loopback-with-python-and-opencv.html
     
 
-• MACOSX solution 
+• MACOSX solution [very unstable :( ]
 
     # make virtual camera using webcamoid.app (see https://webcamoid.github.io/)
     make tmpfs_DIR be a RAM disk (see https://osxdaily.com/2007/03/23/create-a-ram-disk-in-mac-os-x/)

@@ -10,8 +10,8 @@
 • MACOSX solution 
 
     # make virtual camera using webcamoid.app (see https://webcamoid.github.io/)
-    make tmpfs_DIR be a RAM disk
-    make virtual camera stream tmpfs_DIR/auto_crop_output.png (if unavalable run auto_crop waint 3 seconds and press ENTER to make it stops properly)
+    make tmpfs_DIR be a RAM disk (see https://osxdaily.com/2007/03/23/create-a-ram-disk-in-mac-os-x/)
+    make virtual camera stream tmpfs_DIR/auto_crop_output.png 
 
 # to install
     sudo apt-get install -y python3 python3-pip && pip3 install -r requirements.txt

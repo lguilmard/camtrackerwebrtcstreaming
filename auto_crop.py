@@ -317,10 +317,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			D = coord_index_list( D ,list_face_ROI_weight,faces_pos)[1]
 			
 			# ~ print(faces_pos)
-			vote_matrix[0] = vote_matrix[0]*decay+np.array(L)*(1-decay)
-			vote_matrix[1] = vote_matrix[1]*decay+np.array(R)*(1-decay)
-			vote_matrix[2] = vote_matrix[2]*decay+np.array(U)*(1-decay)
-			vote_matrix[3] = vote_matrix[3]*decay+np.array(D)*(1-decay)
+			vote_matrix[0] = vote_matrix[0]*decay+np.array(L)*(1-decay)*min(2,len(faces))
+			vote_matrix[1] = vote_matrix[1]*decay+np.array(R)*(1-decay)*min(2,len(faces))
+			vote_matrix[2] = vote_matrix[2]*decay+np.array(U)*(1-decay)*min(2,len(faces))
+			vote_matrix[3] = vote_matrix[3]*decay+np.array(D)*(1-decay)*min(2,len(faces))
 			
 			CL = int( np.average(faces_pos[0],weights=vote_matrix[0]) )
 			CR = int( np.average(faces_pos[0],weights=vote_matrix[1]) )
@@ -347,14 +347,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			
 			## speed up recrop if out of the box
 			# ~ print( -(Xfield-faces_ROI[0]),Yfield-faces_ROI[1])
-			if abs(Xfield-faces_ROI[0]) > new_field[2]/4 or adjust_field:
-				# ~ print ("outofbox W")
+			if adjust_field: #abs(Xfield-faces_ROI[0]) > new_field[2]/4 or abs(Yfield-faces_ROI[1]) > new_field[3]/4 
+				# ~ print ("outofbox")
 				outOfBox = True
-				decay = max(0.4,0.8*decay)
-			elif  abs(Yfield-faces_ROI[1]) > new_field[3]/4 or adjust_field:
-				# ~ print ("outofbox H")
-				outOfBox = True
-				decay *= max(0.4,0.8*decay)
+				decay = max(0.1,0.8*decay)
 			else:
 				# ~ print ("inside the box <> decay = ",setting["decay"],decay)
 				decay = setting["decay"]
@@ -380,6 +376,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				cv2.line(img,(0,CD),(img.shape[1],CD),(0,0,255),3)
 				
 			# ~ print(vote_matrix[-1])
+		else:
+			decay = setting["decay"]
 		
 		# ~ print(resolution,vote_matrix)
 		cv2.rectangle(img,(new_field[0], new_field[1]), (new_field[0]+new_field[2], new_field[1]+new_field[3]),(0,255,255),int(threshold_newField_oldField*decay))

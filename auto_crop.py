@@ -141,9 +141,9 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	except:
 		NN_img_rescale = 1.30
 		Hxscale = 1.9
-		sizeCare = 0.85
+		sizeCare = 2
 		decay = 0.9
-		stabilizer=1
+		stabilizer=7
 		setting = {"NN_img_rescale":NN_img_rescale, 
 		"Hxscale":Hxscale,
 		"sizeCare":sizeCare,
@@ -156,7 +156,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		cv2.namedWindow('image')
 		
 		# create trackbars for color change
-		cv2.createTrackbar('stabilizer','image',int(stabilizer),1,nothing)
+		cv2.createTrackbar('stabilizer','image',int(stabilizer),20,nothing)
 		cv2.createTrackbar('NN_img_rescale(x100)','image',int(NN_img_rescale*100),450,nothing)
 		cv2.createTrackbar('enlarge_height(x100)','image',int(Hxscale*100),450,nothing)
 		cv2.createTrackbar('sizeCare(x100)','image',int(sizeCare*100),200,nothing)
@@ -180,6 +180,9 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				np.array([0]*(len(faces_pos[1])-1)+[init]),
 				(0,0,resolution[1],resolution[0])
 				] # LimGauche LimDroite LimHaut LimBas ROI
+	
+	threshold_newField_oldField = resolution[0]*0.05
+	new_field = (0,0,resolution[1],resolution[0])
 	
 	# ~ print(len(vote_matrix[0]),len(vote_matrix[2]))
 	
@@ -336,23 +339,29 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			Xfield = int( new_field[0]+new_field[2]/2 )
 			Yfield = int( new_field[1]+new_field[3]/2 )
 			
+			threshold_newField_oldField = abs(CR-CL)*max(1,stabilizer)/100.
+			adjust_field = [abs(new_field[i]-vote_matrix[-1][i]) - threshold_newField_oldField*decay for i in range(len(new_field))]
+			adjust_field = sum([i>0 for i in adjust_field]) > 0
+			# ~ print(adjust_field_border, adjust_field)
+			# ~ print(sum([abs(i) for i in adjust_field_border])/(threshold_newField_oldField*4),decay)
+			
 			## speed up recrop if out of the box
 			# ~ print( -(Xfield-faces_ROI[0]),Yfield-faces_ROI[1])
-			if abs(Xfield-faces_ROI[0]) > new_field[2]/4:
+			if abs(Xfield-faces_ROI[0]) > new_field[2]/4 or adjust_field:
 				# ~ print ("outofbox W")
 				outOfBox = True
-				decay *= 0.8
-			elif  abs(Yfield-faces_ROI[1]) > new_field[3]/2*2/3:
+				decay = max(0.4,0.8*decay)
+			elif  abs(Yfield-faces_ROI[1]) > new_field[3]/4 or adjust_field:
 				# ~ print ("outofbox H")
 				outOfBox = True
-				decay *= 0.8
+				decay *= max(0.4,0.8*decay)
 			else:
 				# ~ print ("inside the box <> decay = ",setting["decay"],decay)
-				# ~ decay = setting["decay"]
+				decay = setting["decay"]
 				outOfBox = False
 			
 			# ~ print( abs(CR-CL)*0.03*decay ,decay)
-			if sum([abs(new_field[i]-vote_matrix[-1][i])> abs(CR-CL)*0.03*decay for i in range(len(new_field))]) > 1 or stabilizer == 0:
+			if adjust_field or stabilizer == 0:
 				vote_matrix[-1] = new_field
 			
 			# ~ cv2.circle(img_oigine, (Xfield, Yfield), 5, (255, 255, 255), -1)
@@ -373,8 +382,9 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			# ~ print(vote_matrix[-1])
 		
 		# ~ print(resolution,vote_matrix)
-		cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
+		cv2.rectangle(img,(new_field[0], new_field[1]), (new_field[0]+new_field[2], new_field[1]+new_field[3]),(0,255,255),int(threshold_newField_oldField*decay))
 		
+		cv2.rectangle(img,(vote_matrix[-1][0],vote_matrix[-1][1]),(vote_matrix[-1][0]+vote_matrix[-1][2],vote_matrix[-1][1]+vote_matrix[-1][3]),(150,255,0),5)
 		
 		if verbose == True:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
@@ -392,6 +402,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				break
 		
 		if noArgs:
+			cv2.rectangle(img_oigine,(new_field[0], new_field[1]), (new_field[0]+new_field[2], new_field[1]+new_field[3]),(0,255,255),int(threshold_newField_oldField*decay))
 			cv2.rectangle(img_oigine,(0,0,resolution[1],resolution[0]),(0,0,255),15)
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
 			#Display the stream.

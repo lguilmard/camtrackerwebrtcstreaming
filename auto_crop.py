@@ -6,6 +6,7 @@ import cv2
 import math as m 
 
 import os
+import threading
 
 
 # ~ print(localPath)
@@ -105,15 +106,22 @@ def get_field(field,L,R,U,D,resolution):
 def vote_dist_coor(vote,resolution):
 	return
 
-
+vote_matrix_field = (0,0,10,10)
+ContinueThreads = True
 
 def cadreur(cap = cv2.VideoCapture(0)):
+	global vote_matrix_field
+	global ContinueThreads
+	
+	
 	print(sys.argv, len(sys.argv))
 	localPath=str(os.path.dirname(os.path.realpath(__file__)))
 	noArgs = len(sys.argv) == 1
+	threaded = len(sys.argv) > 1 and sys.argv[1] == '-thread'
 	verbose = len(sys.argv) > 1 and sys.argv[1] == '-v'
 	pipe_it = len(sys.argv) > 1 and sys.argv[1] == '-pipe'
 	pipe_it_jpg = len(sys.argv) > 1 and sys.argv[1] == '-pipe_JPG'
+	write =  len(sys.argv) > 1 and sys.argv[1] == "-write"
 	
 	face_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_frontalface_alt.xml')
 	eye_cascade = cv2.CascadeClassifier(localPath+'/XML_nn/haarcascade_eye_tree_eyeglasses.xml')
@@ -121,9 +129,11 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	# ~ fake camera
 	# ~ https://github.com/jremmons/pyfakewebcam
 	
-	cv2.namedWindow('cadreur')
 	
+	if threaded != True:
+		cv2.namedWindow('cadreur')
 	
+	print('cadreur ON')
 	try:
 		read_dictionary = np.load(localPath+'/setting.npy',allow_pickle='TRUE').item()
 		NN_img_rescale = float(read_dictionary["NN_img_rescale"])
@@ -181,6 +191,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 				(0,0,resolution[1],resolution[0])
 				] # LimGauche LimDroite LimHaut LimBas ROI
 	
+	vote_matrix_field = (0,0,resolution[1],resolution[0])
+	
 	threshold_newField_oldField = resolution[0]*0.05
 	new_field = (0,0,resolution[1],resolution[0])
 	
@@ -194,9 +206,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 	
 	outOfBox = False
 	
-	while 1:
-		
-		
+	
+	while ContinueThreads:
 		
 		
 		# ~ print(NN_img_rescale)
@@ -350,7 +361,7 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			if adjust_field: #abs(Xfield-faces_ROI[0]) > new_field[2]/4 or abs(Yfield-faces_ROI[1]) > new_field[3]/4 
 				# ~ print ("outofbox")
 				outOfBox = True
-				decay = max(0.1,0.8*decay)
+				decay = max(0.1,0.6*decay)
 			else:
 				# ~ print ("inside the box <> decay = ",setting["decay"],decay)
 				decay = setting["decay"]
@@ -359,6 +370,8 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			# ~ print( abs(CR-CL)*0.03*decay ,decay)
 			if adjust_field or stabilizer == 0:
 				vote_matrix[-1] = new_field
+				# ~ print('vote_matrix_field register')
+				vote_matrix_field = new_field
 			
 			# ~ cv2.circle(img_oigine, (Xfield, Yfield), 5, (255, 255, 255), -1)
 			# ~ cv2.circle(img_oigine, (faces_ROI[0], faces_ROI[1]), 5, (255, 255, 255), -1)
@@ -386,29 +399,21 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		
 		if verbose == True:
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
-			#Display the stream.
-			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
-			
-			
 			cv2.putText(img,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.imshow('image',img )
 			cv2.imshow('cadreur',ROI )
-			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
 		
 		if noArgs:
-			cv2.rectangle(img_oigine,(new_field[0], new_field[1]), (new_field[0]+new_field[2], new_field[1]+new_field[3]),(0,255,255),int(threshold_newField_oldField*decay))
+			rescale = 2
+			cv2.rectangle(img_oigine,(new_field[0], new_field[1]), (new_field[0]+new_field[2], new_field[1]+new_field[3]),(0,255,255,0.1),int(threshold_newField_oldField*decay))
 			cv2.rectangle(img_oigine,(0,0,resolution[1],resolution[0]),(0,0,255),15)
-			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (resolution[1],resolution[0])) 
-			#Display the stream.
-			# ~ cv2.imshow('image',cv2.resize(img, (0,0), fx=0.5, fy=0.5) )
+			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/rescale),int(resolution[0]/rescale))) 
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.imshow('cadreur',ROI )
-			
-			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
@@ -417,8 +422,6 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.imshow('cadreur',ROI )
-			
-			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
@@ -430,14 +433,22 @@ def cadreur(cap = cv2.VideoCapture(0)):
 			cv2.putText(ROI,'PRESS ESC to exit', TopLeftCornerOfText, font, fontScale, fontColor, lineType)
 			cv2.imshow('cadreur',ROI )
 			ret, jpeg = cv2.imencode('.jpg', ROI)
-			#Hit 'Esc' to terminate execution
 			k = cv2.waitKey(30) & 0xff
 			if k == 27:
 				break
 			
 			sys.stdout.write(str(jpeg.tobytes()))
+		
+		if write == True:
+			ROI = cv2.resize(img_oigine[vote_matrix[-1][1]:vote_matrix[-1][1]+vote_matrix[-1][3], vote_matrix[-1][0]:vote_matrix[-1][0]+vote_matrix[-1][2]], (int(resolution[1]/4),int(resolution[0]/4))) 
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+			encode_param = [int(cv2.IMWRITE_PNG_COMPRESSION), 0]
+			cv2.imwrite('test.png', ROI, encode_param)
+			
 	
-	cap.release()
+	
 	cv2.destroyAllWindows()
 	
 	if verbose == True:
@@ -445,6 +456,55 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		
 		np.save(localPath+'/setting.npy', setting) 
 
+def write_cap(cap = cv2.VideoCapture(0)):
+	global vote_matrix_field
+	global ContinueThreads
+	localPath=str(os.path.dirname(os.path.realpath(__file__)))
+	iteration = 0
+	while ContinueThreads:
+		iteration+=1
+		
+		ret, img = cap.read()
+		# ~ img = cv2.imread('test2.png')
+		img = cv2.flip( img, 1 )
+		ROI = cv2.resize(img[vote_matrix_field[1]:vote_matrix_field[1]+vote_matrix_field[3], vote_matrix_field[0]:vote_matrix_field[0]+vote_matrix_field[2]], (int(resolution[1]),int(resolution[0]))) 
+		encode_param = [int(cv2.IMWRITE_PNG_COMPRESSION), 0]
+		cv2.imwrite(localPath+'/tmpfs_DIR/test.png', ROI, encode_param)
+		# ~ print('capture '+localPath+'/tmpfs_DIR/test.png',iteration)
+		
+		# ~ cv2.imshow('cadreur',ROI )
+		k = cv2.waitKey(30) & 0xff
+		if k == 27:
+			ContinueThreads = False
+			
+	cap.release()
+
+def thread_killer():
+	global ContinueThreads
+	input("Press Enter to STOP...")
+	ContinueThreads = False
+	print('STOP CADREUR')
 
 if __name__ == '__main__':
-	cadreur(cv2.VideoCapture(0))
+	thread = len(sys.argv) > 1 and sys.argv[1] == '-thread'
+	ContinueThreads = True
+	
+	if thread:
+		cap = cv2.VideoCapture(0)
+		ret, img = cap.read()
+		resolution = img.shape
+		cap.release()
+		# ~ print(ContinueThreads)
+		
+		fieldUpdater = threading.Thread(target=cadreur)
+		fieldUpdater.start()
+		croper = threading.Thread(target=write_cap)
+		croper.start()
+		print(ContinueThreads)
+		threadkiller = threading.Thread(target= thread_killer)
+		threadkiller.start()
+		
+		# ~ print(vote_matrix_field)
+	else:
+		cadreur()
+	

@@ -5,6 +5,13 @@
     # development ideas under linux
     # to make auto_crop output appear as webcam
     http://wonderingcode.blogspot.com/2017/05/loopback-with-python-and-opencv.html
+    
+
+• MACOSX solution 
+
+    # make virtual camera usin webcamoid.app
+    make tmpfs_DIR be a RAM disk
+    make virtual camera stream tmpfs_DIR/test.png (if unavalable run auto_crop waint 3 seconds and press ENTER to make it stops properly)
 
 # to install
     sudo apt-get install -y python3 python3-pip && pip3 install -r requirements.txt
@@ -13,7 +20,7 @@
     pipenv install
 
 
-# run AND CUSTOMIZE 
+# run SEE RESULT AND CUSTOMIZE 
     python3 path/auto_crop.py -v
 
     GUI parameters :
@@ -23,10 +30,17 @@
     • sizeCare : how much closest face is more captured compared to furthest 
     • decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
 
-# run 
-• see result : 
+# run and see result
 
-    python3 path/auto_crop.py (press ESC to stop program)
+    python3 path/auto_crop.py -thread (press ESC in command prompt to stop program properly)
+
+# run threaded fast output on tmpsf
+
+    # 3 threads programs 
+    • thread 1 <> detect field of view in the webcam image (SLOW)
+    • thread 2 <> crops / resize and write image in tmpfs_DIR directory (FAST)
+    • thread 3 <> WAIT FOR ENTER KEY TO BE PRESSED (to kill threads properly and release webcam capture)
+    python3 path/auto_crop.py -thread (press ENTER in command prompt to stop program properly)
 
 border of camera field of view is materialized by RED rectangle so that user keep aware of exiting camera field
 

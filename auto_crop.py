@@ -150,10 +150,10 @@ def cadreur(cap = cv2.VideoCapture(0)):
 		print(setting)
 	except:
 		NN_img_rescale = 1.30
-		Hxscale = 1.9
-		sizeCare = 2
-		decay = 0.9
-		stabilizer=7
+		Hxscale = 2.7
+		sizeCare = 0.27
+		decay = 0.79
+		stabilizer=15
 		setting = {"NN_img_rescale":NN_img_rescale, 
 		"Hxscale":Hxscale,
 		"sizeCare":sizeCare,

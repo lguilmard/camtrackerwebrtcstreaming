@@ -1,6 +1,7 @@
 # camtrackerwebrtcstreaming
 •1st make an autonomous webcam cameraman like algorithm ( adjust the field of view to see every persons in scene)
 •[TODO] 2nd use output in streamer
+•[TODO] enhance face detection (make it morelieable with face 3/4 or side view) 
 
     # development ideas under linux
     # to make auto_crop output appear as webcam
@@ -79,5 +80,6 @@ under linux open bash terminal and go in path where you want to get the code the
     git clone https://github.com/lguilmard/camtrackerwebrtcstreaming.git
     pipenv shell pipenv install
     python3 auto_crop.py -v
+
 
 

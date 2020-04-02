@@ -30,6 +30,8 @@
     • Hxscale : change vertical croping
     • sizeCare : how much closest face is more captured compared to furthest 
     • decay : the highest the slowest the field changes and the more it is stable <> the slowest the more the field is unstable and changes quickly 
+    
+![alt text](https://github.com/lguilmard/camtrackerwebrtcstreaming/blob/master/preview.png)
 
 # run threaded fast output on tmpsf 
 # (PRESS ENTER TO STOP IT PROPERLY)

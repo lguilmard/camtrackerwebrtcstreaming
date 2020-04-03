@@ -2,6 +2,7 @@
 •1st make an autonomous webcam cameraman like algorithm ( adjust the field of view to see every persons in scene)
 •[TODO] 2nd use output in streamer
 •[TODO] enhance face detection (make it morelieable with face 3/4 or side view) 
+• python3 path/auto_crop_v2.py is getting better and better thank to https://github.com/kb22/Create-Face-Data-from-Images method
 
     # development ideas under linux
     # to make auto_crop output appear as webcam
